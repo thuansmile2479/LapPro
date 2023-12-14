@@ -1,5 +1,5 @@
 import React from 'react'
-import { WrapperContent, WrapperTextValue, WrapprtLableText } from '../style'
+import { LapProContent, LapProTextValue, LapProLableText } from '../style'
 import { Checkbox } from 'antd';
 
 const NavbarComponent = () => {
@@ -9,7 +9,7 @@ const NavbarComponent = () => {
       case 'text':
         return options.map((option) => {
           return (
-            <WrapperTextValue>{option}</WrapperTextValue>
+            <LapProTextValue>{option}</LapProTextValue>
           )
         })
       case 'checkbox':
@@ -28,16 +28,16 @@ const NavbarComponent = () => {
   }
   return (
     <div>
-      <WrapprtLableText>NavbarComponent</WrapprtLableText>
-      <WrapperContent>
+      <LapProLableText>NavbarComponent</LapProLableText>
+      <LapProContent>
         {renderContent('text', ['Tu lanh', 'TV', 'May giat'])}
-      </WrapperContent>
-      <WrapperContent>
+      </LapProContent>
+      <LapProContent>
         {renderContent('checkbox', [
           { value: 'a', label: 'A' },
           { value: 'b', label: 'B' }
         ])}
-      </WrapperContent>
+      </LapProContent>
     </div>
   )
 }

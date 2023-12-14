@@ -1,6 +1,7 @@
 import React from 'react'
 import Slider from 'react-slick'
 import { Image } from 'antd';
+import { LapProSliderStyle } from '../style';
 
 const SliderComponent = ({ arrImages }) => {
     const settings = {
@@ -13,13 +14,13 @@ const SliderComponent = ({ arrImages }) => {
         autoplaySpeed: 1500
     };
     return (
-        <Slider {...settings}>
+        <LapProSliderStyle {...settings}>
             {arrImages.map((image) => {
                 return (
                     <Image src={image} alt="slider" preview={false} width='100%' height='500px'/>
                 )
             })}
-        </Slider>
+        </LapProSliderStyle>
     )
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Badge, Col } from 'antd';
-import { WrapperHeader, WrapperTextHeader, WrapperHeaderAccout, WrapperTextHeaderSmall } from './../style'
+import { LapProHeader, LapProTextHeader, LapProHeaderAccout, LapProTextHeaderSmall } from './../style'
 // import Search from 'antd/es/input/Search';
 import {
     UserOutlined,
@@ -11,35 +11,36 @@ import ButtonInputSearch from '../ButtonInputSearch/ButtonInputSearch';
 
 const HeaderComponent = () => {
     return (
-        <div>
-            <WrapperHeader >
-                <Col span={6}><WrapperTextHeader>LapPro</WrapperTextHeader> </Col>
-                <Col span={12}>
+        <div style={{  width: '100%', display: 'flex',background: 'rgb(26, 148, 255)', justifyContent: 'center' }}>
+            <LapProHeader >
+                <Col span={5}><LapProTextHeader>LapPro</LapProTextHeader> </Col>
+                <Col span={13}>
                     <ButtonInputSearch
                         size="large"
+                        bordered={false}
                         textButton="Tìm kiếm"
                         placeholder="input search text"
                     />
                 </Col>
                 <Col span={6} style={{ display: 'flex', gap: '30px', alignItems: 'center' }} >
-                    <WrapperHeaderAccout>
+                    <LapProHeaderAccout>
                         <UserOutlined style={{ fontSize: '30px' }} />
                         <div >
-                            <WrapperTextHeaderSmall>Đăng nhập/Đăng ký</WrapperTextHeaderSmall>
+                            <LapProTextHeaderSmall>Đăng nhập/Đăng ký</LapProTextHeaderSmall>
                             <div>
-                                <WrapperTextHeaderSmall>Tài khoản</WrapperTextHeaderSmall>
+                                <LapProTextHeaderSmall>Tài khoản</LapProTextHeaderSmall>
                                 <CaretDownOutlined />
                             </div>
                         </div>
-                    </WrapperHeaderAccout>
+                    </LapProHeaderAccout>
                     <div>
                         <Badge count={4} size='small'>
                             <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                         </Badge>
-                        <WrapperTextHeaderSmall>Giỏ hàng</WrapperTextHeaderSmall>
+                        <LapProTextHeaderSmall>Giỏ hàng</LapProTextHeaderSmall>
                     </div>
                 </Col>
-            </WrapperHeader>
+            </LapProHeader>
         </div>
     )
 }
