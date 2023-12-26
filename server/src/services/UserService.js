@@ -1,6 +1,6 @@
-const User = require('../models/UserModel')
+const User = require("../models/UserModel")
 const bcrypt = require("bcrypt")
-const { genneralAccessToken, genneralRefreshToken } = require('./JwtService')
+const { genneralAccessToken, genneralRefreshToken } = require("./JwtService")
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
@@ -48,7 +48,7 @@ const loginUser = (userLogin) => {
                     message: 'The user is not defined'
                 })
             }
-            const comparePassword = await bcrypt.compareSync(password, checkUser.password)
+            const comparePassword = bcrypt.compareSync(password, checkUser.password)
 
             if (!comparePassword) {
                 resolve({
@@ -68,7 +68,7 @@ const loginUser = (userLogin) => {
 
             resolve({
                 status: 'OK',
-                message: 'SUCCESS', 
+                message: 'SUCCESS',
                 access_token,
                 refresh_token
             })
@@ -90,12 +90,12 @@ const updateUser = (id, data) => {
                     message: 'The user is not defined'
                 })
             }
-            const updateUser = await User.findByIdAndUpdate(id, data, { new: true })
- 
+
+            const updatedUser = await User.findByIdAndUpdate(id, data, { new: true })
             resolve({
                 status: 'OK',
-                message: 'SUCCESS', 
-                data: updateUser
+                message: 'SUCCESS',
+                data: updatedUser
             })
         } catch (e) {
             reject(e)
@@ -115,26 +115,26 @@ const deleteUser = (id) => {
                     message: 'The user is not defined'
                 })
             }
+
             await User.findByIdAndDelete(id)
- 
             resolve({
                 status: 'OK',
-                message: 'Delete user success',  
+                message: 'Delete user success',
             })
         } catch (e) {
             reject(e)
         }
     })
 }
+ 
 
 const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
-        try { 
-            const allUser = await User.find()
- 
+        try {
+            const allUser = await User.find().sort({createdAt: -1, updatedAt: -1})
             resolve({
                 status: 'OK',
-                message: 'Success',  
+                message: 'Success',
                 data: allUser
             })
         } catch (e) {
@@ -165,8 +165,6 @@ const getDetailUser = (id) => {
         }
     })
 }
-
- 
 
 module.exports = {
     createUser,
