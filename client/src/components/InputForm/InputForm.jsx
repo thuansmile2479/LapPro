@@ -1,5 +1,5 @@
 import React from 'react'
-import { LapProInputStyle } from './style' 
+import { LapProInputStyle } from '../style'
 
 const InputForm = (props) => {
     const { placeholder = 'Nhập text', ...rests } = props

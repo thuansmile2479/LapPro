@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Card, Row, Image, Col, InputNumber, Input  } from "antd";
+import { Card, Row, Image, Col, InputNumber, Input } from "antd";
 import Slider from "react-slick";
 
 
@@ -210,5 +210,12 @@ export const LapProSliderStyle = styled(Slider)`
                 }
             }
         }
+    }
+`
+
+export const LapProContentPopup = styled.p`
+    cursor: pointer;
+    &:hover {
+        color: rgb(26, 148, 255);
     }
 `

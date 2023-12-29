@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import ButtonComponent from '../components/ButtonComponent/ButtonComponent'
-import { Col } from "antd";
+import { Col, Upload } from "antd";
 
 export const LapProTypeProduct = styled.div`
     display: flex;
@@ -66,4 +66,45 @@ export const LapProTextLight = styled.span`
     color: rgb(13, 92, 182);
     font-size: 13px;
     cursor: pointer;
+`
+export const LapProHeader = styled.h1`
+    color: #000;
+    font-size: 18px;
+    margin: 4px 0;
+`
+export const LapProContentProfile = styled.div`
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 10px;
+    gap: 30px;
+`
+
+export const LapProLabel = styled.label`
+    color: #000;
+    font-size: 12px;
+    line-height: 30px;
+    font-weight: 600;
+    width: 60px;
+    text-align: left;
+`
+
+export const LapProInput = styled.div`
+    display: flex;
+    align-items: cemter;
+    gap: 20px;
+`
+
+export const LapProUploadFile = styled(Upload)`
+    & .ant-upload.ant-upload-select.ant-upload-select-picture-card {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+    & .ant-upload-list-item-info {
+        display: none
+    }
 `
