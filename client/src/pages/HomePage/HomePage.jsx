@@ -6,9 +6,25 @@ import slider01 from '../../assets/images/slider01.webp'
 import slider02 from '../../assets/images/slider02.webp'
 import slider03 from '../../assets/images/slider03.webp'
 import CardComponent from '../../components/CardComponent/CardComponent'
+import * as ProductService from '../../services/ProductService'
+import { useQuery } from '@tanstack/react-query'
 
 const HomePage = () => {
   const arr = ['TV', 'Tu lanh', 'Lapop']
+  const fetchProductAll = async () => {
+    const res = await ProductService.getAllProduct()
+    // console.log('res', res)
+    return res
+  }
+
+  const { isLoading, data: products } = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProductAll,
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  // console.log('data', products)
 
   return (
     <>
@@ -25,17 +41,24 @@ const HomePage = () => {
         <div id="container" style={{ height: '1000px', width: '1330px', margin: '0 auto' }}>
           <SliderComponent arrImages={[slider01, slider02, slider03]} />
           <LapProProducts>
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
-            <CardComponent />
+            {products?.data?.map((product) => {
+              return (
+                <CardComponent
+                  key={product.id}
+                  countInStock={product.countInStock}
+                  description={product.description}
+                  image={product.image}
+                  name={product.name}
+                  price={product.price}
+                  rating={product.rating}
+                  type={product.type}
+                  discount={product.discount}
+                  selled={product.selled}
+                  
+                />
+              )
+            })}
+
           </LapProProducts>
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
             <LapProButtonMore textButton='Xem Thêm' type="outline" styleButton={{

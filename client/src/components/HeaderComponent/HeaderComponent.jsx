@@ -15,7 +15,7 @@ import Loading from '../Loading'
 
 
 
-const HeaderComponent = () => {
+const HeaderComponent = ({ inSearch = false, inCart = false }) => {
     const navigate = useNavigate()
     const user = useSelector((state) => state.user)
     const dispatch = useDispatch()
@@ -42,23 +42,28 @@ const HeaderComponent = () => {
 
     const content = (
         <div>
-            <LapProContentPopup onClick={() => navigate('/profile')}>Thông tin người dùng</LapProContentPopup>
+            {user?.isAdmin && (
+                <LapProContentPopup onClick={() => navigate('/system/admin')}>Trang quản trị</LapProContentPopup>
+            )}
+            <LapProContentPopup onClick={() => navigate('/profile')}>Trang cá nhân</LapProContentPopup>
             <LapProContentPopup onClick={handleLogout}>Đăng xuất</LapProContentPopup>
         </div>
     );
 
     return (
         <div style={{ width: '100%', display: 'flex', background: 'rgb(26, 148, 255)', justifyContent: 'center' }}>
-            <LapProHeader >
+            <LapProHeader style={{ justifyContent: inSearch && inCart ? 'space-between' : 'flex-end' }}>
                 <Col span={5}><LapProTextHeader>LapPro</LapProTextHeader> </Col>
-                <Col span={13}>
-                    <ButtonInputSearch
-                        size="large"
-                        textButton="Tìm kiếm"
-                        placeholder="input search text"
-                    />
-                </Col>
-                <Col span={6} style={{ display: 'flex', gap: '30px', alignItems: 'center' }} >
+                {!inSearch && (
+                    <Col span={13}>
+                        <ButtonInputSearch
+                            size="large"
+                            textButton="Tìm kiếm"
+                            placeholder="input search text"
+                        />
+                    </Col>
+                )}
+                <Col span={6} style={{ display: 'flex' , alignItems: 'center', justifyContent: 'space-between' }} >
                     <Loading isLoading={loading}>
                         <LapProHeaderAccout>
                             {userAvatar ? (
@@ -86,13 +91,14 @@ const HeaderComponent = () => {
                             )}
                         </LapProHeaderAccout>
                     </Loading>
-
-                    <div>
-                        <Badge count={4} size='small'>
-                            <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
-                        </Badge>
-                        <LapProTextHeaderSmall>Giỏ hàng</LapProTextHeaderSmall>
-                    </div>
+                    {!inCart && (
+                        <div>
+                            <Badge count={4} size='small'>
+                                <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
+                            </Badge>
+                            <LapProTextHeaderSmall>Giỏ hàng</LapProTextHeaderSmall>
+                        </div>
+                    )}
                 </Col>
             </LapProHeader>
         </div>

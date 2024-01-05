@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Card, Row, Image, Col, InputNumber, Input } from "antd";
+import { Card, Row, Image, Col, InputNumber, Input, Upload } from "antd";
 import Slider from "react-slick";
 
 
@@ -217,5 +217,24 @@ export const LapProContentPopup = styled.p`
     cursor: pointer;
     &:hover {
         color: rgb(26, 148, 255);
+    }
+`
+
+export const LapProHeader02 = styled.h1`
+    color: #000;
+    font-size: 14px;
+`
+
+export const LapProUploadFile = styled(Upload)`
+    & .ant-upload.ant-upload-select.ant-upload-select-picture-card {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+    & .ant-upload-list-item-info {
+        display: none
+    }
+    & .ant-upload-list-item {
+        display: none;
     }
 `
