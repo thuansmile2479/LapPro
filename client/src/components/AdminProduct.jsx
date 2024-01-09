@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Button, Form, Space } from 'antd'
+import { Button, Form, Select, Space } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import { LapProHeader02, LapProUploadFile } from './style'
 import TableComponent from './Message/TableComponent'
 import InputComponent from '../InputComponent/InputComponent'
-import { getBase64 } from '../utils'
+import { getBase64, renderOptions } from '../utils'
 import * as ProductService from '../services/ProductService'
 import { useMutationHook } from '../hooks/useMutationHook'
 // import Loading from '../components/Loading'
@@ -21,9 +21,8 @@ const AdminProduct = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false)
   const user = useSelector((state) => state?.user)
-  const [searchText, setSearchText] = useState('');
-  const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+  const [typeSelect, setTypeSelect] = useState('')
 
   const [stateProduct, setStateProduct] = useState({
     name: '',
@@ -32,7 +31,8 @@ const AdminProduct = () => {
     price: '',
     rating: '',
     description: '',
-    image: ''
+    image: '',
+    newType:''
   })
 
   const [stateProductDetail, setStateProductDetail] = useState({
@@ -99,6 +99,18 @@ const AdminProduct = () => {
     },
   )
 
+  const mutationDeletedMany = useMutationHook(
+    (data) => {
+      const {
+        token, ...ids
+      } = data
+      const res = ProductService.deleteManyProduct(
+        ids,
+        token)
+      return res
+    },
+  )
+
 
   const getAllProducts = async () => {
     const res = await ProductService.getAllProduct()
@@ -125,10 +137,10 @@ const AdminProduct = () => {
   }, [form, stateProductDetail])
 
   useEffect(() => {
-    if (rowSelected) {
+    if (rowSelected && isOpenDrawer) {
       fetchGetDetailProduct(rowSelected)
     }
-  }, [rowSelected])
+  }, [rowSelected, isOpenDrawer])
 
   // console.log("satetProduct", stateProductDetail);
   const handleDetailsProduct = () => {
@@ -138,11 +150,26 @@ const AdminProduct = () => {
     setIsOpenDrawer(true)
   }
 
+  const handleDeleteManyProducts = (ids) => {
+    mutationDeletedMany.mutate({ ids: ids, token: user?.access_token }, {
+      onSettled: () => {
+        queryProduct.refetch()
+      }
+    })
+  }
+
+  const fetchAllTypeProduct = async () => {
+    const res = await ProductService.getAllTypeProduct()
+    return res
+  }
+
   const { data, isSuccess, isError } = mutation
   const { data: dataUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
   const { data: dataDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDeleted
+  const { data: dataDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
 
   const queryProduct = useQuery({ queryKey: ['products'], queryFn: getAllProducts })
+  const typeProduct = useQuery({ queryKey: ['type-product'], queryFn: fetchAllTypeProduct })
   const { data: products } = queryProduct
   const renderAction = () => {
     return (
@@ -191,7 +218,7 @@ const AdminProduct = () => {
           >
             Reset
           </Button>
-         
+
         </Space>
       </div>
     ),
@@ -294,6 +321,14 @@ const AdminProduct = () => {
   }, [isSuccess])
 
   useEffect(() => {
+    if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
+      message.success()
+    } else if (isErrorDeletedMany) {
+      message.error()
+    }
+  }, [isSuccessDeletedMany])
+
+  useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === 'OK') {
       message.success()
       handleCancelDelete()
@@ -353,7 +388,16 @@ const AdminProduct = () => {
   }
 
   const onFinish = () => {
-    mutation.mutate(stateProduct, {
+    const params = {
+      name: stateProduct.name,
+      type: stateProduct.type === 'add_type' ? stateProduct.newType : stateProduct.type,
+      countInStock: stateProduct.countInStock,
+      price: stateProduct.price,
+      rating: stateProduct.rating,
+      description: stateProduct.description,
+      image: stateProduct.image,
+    }
+    mutation.mutate(params, {
       onSettled: () => {
         queryProduct.refetch()
       }
@@ -404,6 +448,13 @@ const AdminProduct = () => {
     })
   }
 
+  const handleChangeSelect = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      type: value
+    })
+  }
+
   return (
     <div>
       <LapProHeader02>Quản lý sản phẩm</LapProHeader02>
@@ -413,7 +464,7 @@ const AdminProduct = () => {
         </Button>
       </div>
       <div style={{ marginTop: '20px' }}>
-        <TableComponent columns={columns} data={dataTable} onRow={(record, rowIndex) => {
+        <TableComponent handleDeleteMany={handleDeleteManyProducts} columns={columns} data={dataTable} onRow={(record, rowIndex) => {
           return {
             onClick: envnt => {
               setRowSelected(record._id)
@@ -446,8 +497,23 @@ const AdminProduct = () => {
             name="type"
             rules={[{ required: true, message: 'Please input your type!' }]}
           >
-            <InputComponent value={stateProduct.type} onChange={handleOnchange} name="type" />
+            <Select
+              name="type"
+              value={stateProduct.type}
+              onChange={handleChangeSelect}
+              options={renderOptions(typeProduct?.data?.data)}
+            />
           </Form.Item>
+          {stateProduct.type === 'add_type' && (
+            <Form.Item
+              label="New type"
+              name="newType"
+              rules={[{ required: true, message: 'Please input your type!' }]}
+            > 
+                <InputComponent value={stateProduct.newType} onChange={handleOnchange} name="newType" /> 
+            </Form.Item>
+          )}
+
 
           <Form.Item
             label="Count isStock"

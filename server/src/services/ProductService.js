@@ -106,6 +106,20 @@ const deleteProduct = (id) => {
         }
     })
 }
+
+const deleteMany = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Product.deleteMany({_id: ids})
+            resolve({
+                status: 'OK',
+                message: 'Delete product success',
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
  
 
 const getAllProduct = (limit , page, sort, filter ) => {
@@ -153,8 +167,20 @@ const getAllProduct = (limit , page, sort, filter ) => {
 }
 
 
-
- 
+const getAllType = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allType = await Product.distinct('type')
+            resolve({
+                status: 'OK',
+                message: 'Success',
+                data: allType,
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
  
 
 module.exports = {
@@ -162,5 +188,7 @@ module.exports = {
     updateProduct,
     getDetailsProduct,
     deleteProduct,
-    getAllProduct
+    getAllProduct,
+    deleteMany,
+    getAllType 
 }

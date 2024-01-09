@@ -23,18 +23,13 @@ const AdminUser = () => {
   const user = useSelector((state) => state?.user)
   const searchInput = useRef(null);
 
-  const [stateUser, setStateUser] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    isAdmin: false
-  })
-
   const [stateUserDetail, setStateUserDetail] = useState({
     name: '',
     email: '',
     phone: '',
-    isAdmin: false
+    isAdmin: false,
+    avatar: '',
+    address: ''
   })
 
   const [form] = Form.useForm();
@@ -54,6 +49,26 @@ const AdminUser = () => {
       return res
     }
   );
+
+  const mutationDeletedMany = useMutationHook(
+    (data) => {
+      const { 
+        token, ...ids
+      } = data
+      const res = UserService.deleteManyUser(
+        ids,
+        token)
+      return res
+    },
+  )
+
+  const handleDeleteManyUsers = (ids) =>{
+    mutationDeletedMany.mutate({ ids: ids, token: user?.access_token }, {
+      onSettled: () => {
+        queryUser.refetch()
+      }
+    })
+  }
 
   const mutationDeleted = useMutationHook(
     (data) => {
@@ -80,7 +95,9 @@ const AdminUser = () => {
         name: res?.data?.name,
         email: res?.data?.email,
         phone: res?.data?.phone,
-        isAdmin: res?.data?.isAdmin
+        isAdmin: res?.data?.isAdmin,
+        address: res?.data?.address,
+        avatar: res?.data?.avatar
       })
     }
   }
@@ -90,10 +107,10 @@ const AdminUser = () => {
   }, [form, stateUserDetail])
 
   useEffect(() => {
-    if (rowSelected) {
+    if (rowSelected && isOpenDrawer) {
       fetchGetDetailUser(rowSelected)
     }
-  }, [rowSelected])
+  }, [rowSelected, isOpenDrawer])
 
   // console.log("satetProduct", stateUserDetail);
   const handleDetailsProduct = () => {
@@ -105,6 +122,7 @@ const AdminUser = () => {
 
   const { data: dataUpdated, isSuccess: isSuccessUpdated, isError: isErrorUpdated } = mutationUpdate
   const { data: dataDeleted, isSuccess: isSuccessDeleted, isError: isErrorDeleted } = mutationDeleted
+  const { data: dataDeletedMany, isSuccess: isSuccessDeletedMany, isError: isErrorDeletedMany } = mutationDeletedMany
 
   const queryUser = useQuery({ queryKey: ['user'], queryFn: getAllUsers })
   const { data: users } = queryUser
@@ -201,6 +219,13 @@ const AdminUser = () => {
     },
 
     {
+      title: 'Address',
+      dataIndex: 'address',
+      sorter: (a, b) => a.address.length - b.address.length,
+      ...getColumnSearchProps('address')
+    },
+
+    {
       title: 'Admin',
       dataIndex: 'isAdmin',
       // ...getColumnSearchProps('isAdmin'),
@@ -243,6 +268,14 @@ const AdminUser = () => {
     }
   }, [isErrorDeleted])
 
+  useEffect(() => {
+    if (isSuccessDeletedMany && dataDeletedMany?.status === 'OK') {
+      message.success()
+    } else if (isErrorDeletedMany) {
+      message.error()
+    }
+  }, [isSuccessDeletedMany])
+
   const handleCloseDrawer = () => {
     setIsOpenDrawer(false)
     setStateUserDetail({
@@ -283,16 +316,16 @@ const AdminUser = () => {
     })
   }
 
-  const handleOnchangeAvatar = async ({ fileList }) => {
-    const file = fileList[0]
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateUser({
-      ...stateUser,
-      image: file.preview
-    })
-  }
+  // const handleOnchangeAvatar = async ({ fileList }) => {
+  //   const file = fileList[0]
+  //   if (!file.url && !file.preview) {
+  //     file.preview = await getBase64(file.originFileObj);
+  //   }
+  //   setStateUser({
+  //     ...stateUser,
+  //     image: file.preview
+  //   })
+  // }
 
   const handleOnchangeAvatarDetail = async ({ fileList }) => {
     const file = fileList[0]
@@ -301,7 +334,7 @@ const AdminUser = () => {
     }
     setStateUserDetail({
       ...stateUserDetail,
-      image: file.preview
+      avatar: file.preview
     })
   }
   // console.log('user', user);
@@ -317,7 +350,7 @@ const AdminUser = () => {
       <LapProHeader02>Quản lý người dùng</LapProHeader02>
       
       <div style={{ marginTop: '20px' }}>
-        <TableComponent columns={columns} data={dataTable} onRow={(record, rowIndex) => {
+        <TableComponent handleDeleteMany={handleDeleteManyUsers} columns={columns} data={dataTable} onRow={(record, rowIndex) => {
           return {
             onClick: envnt => {
               setRowSelected(record._id)
@@ -356,20 +389,28 @@ const AdminUser = () => {
           <Form.Item
             label="Phone"
             name="phone"
-            rules={[{ required: true, message: 'Please input your isStock!' }]}
+            rules={[{ required: true, message: 'Please input your phone!' }]}
           >
             <InputComponent value={stateUserDetail.phone} onChange={handleOnchangeDetail} name="phone" />
           </Form.Item>
 
-          {/* <Form.Item
-            label="Image"
-            name="image"
-            rules={[{ required: true, message: 'Please input your count image!' }]}
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[{ required: true, message: 'Please input your address!' }]}
+          >
+            <InputComponent value={stateUserDetail.address} onChange={handleOnchangeDetail} name="address" />
+          </Form.Item>
+
+          <Form.Item
+            label="Avatar"
+            name="avatar"
+            rules={[{ required: true, message: 'Please input your avatar!' }]}
           >
             <LapProUploadFile onChange={handleOnchangeAvatarDetail} maxCount={1}>
               <Button >Select File</Button>
-              {stateUserDetail?.image && (
-                <img src={stateUserDetail?.image} style={{
+              {stateUserDetail?.avatar && (
+                <img src={stateUserDetail?.avatar} style={{
                   height: '60px',
                   width: '60px',
                   // borderRadius: '50%',
@@ -378,7 +419,7 @@ const AdminUser = () => {
                 }} alt="avatar" />
               )}
             </LapProUploadFile>
-          </Form.Item> */}
+          </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
             <Button type="primary" htmlType="submit">

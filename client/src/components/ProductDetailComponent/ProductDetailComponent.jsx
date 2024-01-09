@@ -1,18 +1,46 @@
-import { Col, Image, Row } from 'antd'
-import React from 'react'
-import pro01 from '../../assets/images/pro01.webp'
+import { Col, Image, Rate, Row } from 'antd'
+import React, { useState } from 'react'
 import pro02 from '../../assets/images/pro02.webp'
 import { LapProInputNumber, LapProPriceProduct, LapProPricetextProduct, LapProQualityProduct, LapProStyleColImage, LapProStyleImageSmall, LapProStyleTextSell, LapProStylenameProduct } from '../style'
-import { StarFilled, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
+import * as ProductService from '../../services/ProductService'
+import { useQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
 
-const ProductDetailComponent = () => {
-    const onChange = () => { }
+const ProductDetailComponent = ({ idProduct }) => {
+    const [numProduct, setNumProduct] = useState(1)
+    const user = useSelector((state) => state.user)
+    const onChange = (value) => {
+        setNumProduct(Number(value))
+    }
+    const fetchGetDetailProduct = async (context) => {
+        const id = context?.queryKey && context?.queryKey[1]
+        if (id) {
+            const res = await ProductService.getDetailProduct(id)
+            return res.data
+        }
+    }
+
+    const handleChangeCount = (type) => {
+        if (type === 'increase') {
+            setNumProduct(numProduct + 1)
+        } else {
+            setNumProduct(numProduct - 1)
+        }
+    }
+
+
+    const { data: productDetail } = useQuery({
+        queryKey: ['product-detail', idProduct],
+        queryFn: fetchGetDetailProduct,
+        config: { enabled: !!idProduct }
+    });
 
     return (
         <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px', height: '100%' }}>
             <Col span={10} style={{ borderRight: '1px solid #e5e5e5', paddingRight: '8px' }}>
-                <Image src={pro01} alt='image product' preview={false} />
+                <Image src={productDetail?.image} alt='image product' preview={false} />
                 <Row style={{ paddingTop: '10px', justifyContent: 'space-between' }}>
                     <LapProStyleColImage span={4}>
                         <LapProStyleImageSmall src={pro02} alt="image small" preview={false} />
@@ -41,30 +69,28 @@ const ProductDetailComponent = () => {
                 </Row>
             </Col>
             <Col span={14} style={{ paddingLeft: '10px' }}>
-                <LapProStylenameProduct>MacBook Air M1 13 inch 2020</LapProStylenameProduct>
+                <LapProStylenameProduct>{productDetail?.name}</LapProStylenameProduct>
                 <div>
-                    <StarFilled style={{ fontSize: '12px', color: 'rgb(253, 216, 54' }} />
-                    <StarFilled style={{ fontSize: '12px', color: 'rgb(253, 216, 54' }} />
-                    <StarFilled style={{ fontSize: '12px', color: 'rgb(253, 216, 54' }} />
+                    <Rate allowHalf defaultValue={productDetail?.rating} value={productDetail?.rating}/>
                     <LapProStyleTextSell> | Da ban 100+</LapProStyleTextSell>
                 </div>
                 <LapProPriceProduct>
-                    <LapProPricetextProduct>19.999.000</LapProPricetextProduct>
+                    <LapProPricetextProduct>{productDetail?.price}</LapProPricetextProduct>
                 </LapProPriceProduct>
                 <LapProPriceProduct>
                     <span>Giao đến</span>
-                    <span className='address'>Cao đẳng FPT Polytechnic</span> -
+                    <span className='address'>{user?.address}</span> -
                     <span className='change-address'> Đổi địa chỉ</span>
                 </LapProPriceProduct>
                 <div>
                     <div style={{ margin: '10px 0 20px', padding: '10px 0', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
                         <div style={{ marginBottom: '10px' }}>Số lượng</div>
                         <LapProQualityProduct>
-                            <button style={{ border: 'none', background: 'transparent' }}>
+                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease')}>
                                 <MinusOutlined style={{ color: '#000', fontSize: '20px' }} />
                             </button>
-                            <LapProInputNumber defaultValue={3} onChange={onChange} size="small" />
-                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} >
+                            <LapProInputNumber onChange={onChange} defaultValue={1} value={numProduct} size="small" />
+                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase')}>
                                 <PlusOutlined style={{ color: '#000', fontSize: '20px' }} />
                             </button>
                         </LapProQualityProduct>

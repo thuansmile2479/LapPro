@@ -1,16 +1,22 @@
 import React from 'react'
 import { StarFilled } from '@ant-design/icons';
 import { StyleNameProduct, LapProCarStyle, LapProDiscountText, LapProPriceText, LapProReportText } from './../style';
+import { useNavigate } from 'react-router-dom';
 
 const CardComponent = (props) => {
-    const { countInStock, description, image, name, price, rating, type, discount, selled} = props 
+    const { countInStock, description, image, name, price, rating, type, discount, selled, id} = props 
+    const navigate = useNavigate()
+    const handleDetailProduct = (id) => {
+        navigate(`/product_detail/${id}`)
+    }
     return (
         <LapProCarStyle
             hoverable
             headStyle={{ width: '250px', height: '250px' }}
             style={{ width: 250 }}
             bodyStyle={{ padding: '10px' }}
-            cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+            cover={<img alt="example" src={image} />}
+            onClick={() => handleDetailProduct(id)}
         >
             <StyleNameProduct>{name}</StyleNameProduct>
             <LapProReportText>
@@ -20,9 +26,9 @@ const CardComponent = (props) => {
                 <span> | Da ban {selled || 1000}+</span>
             </LapProReportText>
             <LapProPriceText>
-                <span style={{ marginRight: '8px' }}>{price} đ</span>
+                <span style={{ marginRight: '8px' }}>{price?.toLocaleString()} đ</span>
                 <LapProDiscountText>
-                    {discount || 5}%
+                   - {discount || 5}%
                 </LapProDiscountText>
             </LapProPriceText>
         </LapProCarStyle>

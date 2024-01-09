@@ -13,13 +13,14 @@ export const LapProTypeProduct = styled.div`
 export const LapProButtonMore = styled(ButtonComponent)`
     &:hover {
         color: #fff;
-        background: fgb(13, 92, 182);
+        background: #1a92ff;
         span {
             color: #fff;
         }
     }
     width: 100%;
     text-align: center;
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointers'}
 `
 
 export const LapProProducts = styled.div`
