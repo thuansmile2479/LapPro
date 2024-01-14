@@ -23,6 +23,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
     const [userName, setUserName] = useState('')
     const [userAvatar, setUserAvatar] = useState('')
     const [search, setSearch] = useState('')
+    const order = useSelector((state) => state.order)
     const [loading, setLoading] = useState(false)
     const handleNavigateLogin = () => {
         navigate('/signin')
@@ -100,7 +101,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
                     </Loading>
                     {!inCart && (
                         <div onClick={() => navigate('/order')} style={{cursor: 'pointer'}}>
-                            <Badge count={4} size='small'>
+                            <Badge count={order?.orderItems?.length} size='small'>
                                 <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                             </Badge>
                             <LapProTextHeaderSmall>Giỏ hàng</LapProTextHeaderSmall>

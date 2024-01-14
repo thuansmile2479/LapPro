@@ -6,9 +6,14 @@ import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import ButtonComponent from '../ButtonComponent/ButtonComponent'
 import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom';
+import { addOrderProduct } from '../../redux/slices/orderSlide';
 
 const ProductDetailComponent = ({ idProduct }) => {
+    const navigate = useNavigate()
+    const location = useLocation()
+    const dispatch = useDispatch()
     const [numProduct, setNumProduct] = useState(1)
     const user = useSelector((state) => state.user)
     const onChange = (value) => {
@@ -21,6 +26,8 @@ const ProductDetailComponent = ({ idProduct }) => {
             return res.data
         }
     }
+    // console.log('location', location);
+
 
     const handleChangeCount = (type) => {
         if (type === 'increase') {
@@ -29,13 +36,31 @@ const ProductDetailComponent = ({ idProduct }) => {
             setNumProduct(numProduct - 1)
         }
     }
-
-
+ 
     const { data: productDetail } = useQuery({
         queryKey: ['product-detail', idProduct],
         queryFn: fetchGetDetailProduct,
         config: { enabled: !!idProduct }
     });
+    
+    const handleAddOrderProduct = () => {
+        if (!user?.id) {
+            navigate('/signin', { state: location?.pathname })
+        } else {
+            dispatch(addOrderProduct({
+                orderItem: {
+                    name: productDetail?.name,
+                    amount: numProduct,
+                    image: productDetail?.image,
+                    price: productDetail?.price,
+                    product: productDetail?._id
+                }
+            }))
+        }
+    }
+
+    console.log('productDetail', productDetail, user);
+
 
     return (
         <Row style={{ padding: '16px', background: '#fff', borderRadius: '4px', height: '100%' }}>
@@ -71,7 +96,7 @@ const ProductDetailComponent = ({ idProduct }) => {
             <Col span={14} style={{ paddingLeft: '10px' }}>
                 <LapProStylenameProduct>{productDetail?.name}</LapProStylenameProduct>
                 <div>
-                    <Rate allowHalf defaultValue={productDetail?.rating} value={productDetail?.rating}/>
+                    <Rate allowHalf defaultValue={productDetail?.rating} value={productDetail?.rating} />
                     <LapProStyleTextSell> | Da ban 100+</LapProStyleTextSell>
                 </div>
                 <LapProPriceProduct>
@@ -107,7 +132,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                             border: 'none',
                             borderRadius: '4px'
                         }}
-                        // onClick={handleAddOrderProduct}
+                        onClick={handleAddOrderProduct}
                         textButton={'Chọn mua'}
                         styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
                     ></ButtonComponent>
