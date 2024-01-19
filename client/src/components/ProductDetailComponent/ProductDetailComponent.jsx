@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { addOrderProduct } from '../../redux/slices/orderSlide';
+import { converPrice } from '../../utils';
 
 const ProductDetailComponent = ({ idProduct }) => {
     const navigate = useNavigate()
@@ -100,7 +101,7 @@ const ProductDetailComponent = ({ idProduct }) => {
                     <LapProStyleTextSell> | Da ban 100+</LapProStyleTextSell>
                 </div>
                 <LapProPriceProduct>
-                    <LapProPricetextProduct>{productDetail?.price}</LapProPricetextProduct>
+                    <LapProPricetextProduct>{converPrice(productDetail?.price)}</LapProPricetextProduct>
                 </LapProPriceProduct>
                 <LapProPriceProduct>
                     <span>Giao đến</span>

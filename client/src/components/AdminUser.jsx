@@ -84,7 +84,7 @@ const AdminUser = () => {
 
 
   const getAllUsers = async () => {
-    const res = await UserService.getAlllUser()
+    const res = await UserService.getAlllUser(user?.access_token)
     return res
   }
 
@@ -338,7 +338,7 @@ const AdminUser = () => {
     })
   }
   // console.log('user', user);
-  const onUpdateProduct = () => {
+  const onUpdateUser = () => {
     mutationUpdate.mutate({ id: rowSelected, token: user?.access_token, ...stateUserDetail }, {
       onSettled: () => {
         queryUser.refetch()
@@ -366,7 +366,7 @@ const AdminUser = () => {
           wrapperCol={{ span: 22 }}
           style={{ maxWidth: 600 }}
           initialValues={{ remember: true }}
-          onFinish={onUpdateProduct}
+          onFinish={onUpdateUser}
           autoComplete="on"
           form={form}
         >

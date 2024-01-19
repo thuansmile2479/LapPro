@@ -2,6 +2,7 @@ import React from 'react'
 import { StarFilled } from '@ant-design/icons';
 import { StyleNameProduct, LapProCarStyle, LapProDiscountText, LapProPriceText, LapProReportText } from './../style';
 import { useNavigate } from 'react-router-dom';
+import { converPrice } from '../../utils';
 
 const CardComponent = (props) => {
     const { countInStock, description, image, name, price, rating, type, discount, selled, id} = props 
@@ -26,7 +27,7 @@ const CardComponent = (props) => {
                 <span> | Da ban {selled || 1000}+</span>
             </LapProReportText>
             <LapProPriceText>
-                <span style={{ marginRight: '8px' }}>{price?.toLocaleString()} đ</span>
+                <span style={{ marginRight: '8px' }}>{converPrice(price)}</span>
                 <LapProDiscountText>
                    - {discount || 5}%
                 </LapProDiscountText>

@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { Card, Row, Image, Col, InputNumber, Input, Upload } from "antd";
+import { Card, Row, Image, Col, InputNumber, Input, Upload, Steps } from "antd";
 import Slider from "react-slick";
+const { Step } = Steps;
 
 
 export const LapProCarStyle = styled(Card)`
@@ -237,4 +238,10 @@ export const LapProUploadFile = styled(Upload)`
     & .ant-upload-list-item {
         display: none;
     }
+`
+
+export const CustomStep = styled(Step)`
+  .ant-steps-item-process>.ant-steps-item-container>.ant-steps-item-icon {
+    background: #9255FD
+  }
 `

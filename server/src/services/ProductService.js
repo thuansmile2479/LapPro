@@ -2,7 +2,7 @@ const Product = require("../models/ProductModel")
 
 const createProduct = (newUser) => {
     return new Promise(async (resolve, reject) => {
-        const { name, image, type, price, countInStock, rating, description } = newUser
+        const { name, image, type, price, countInStock, rating, description, discount } = newUser
         try {
             const checkProduct = await Product.findOne({
                 name: name
@@ -14,13 +14,14 @@ const createProduct = (newUser) => {
                 })
             }
             const newProduct = await Product.create({
-                name, 
-                image, 
-                type, 
-                price, 
-                countInStock, 
-                rating, 
-                description
+                name,
+                image,
+                type,
+                price,
+                countInStock,
+                rating,
+                description,
+                discount
             })
             if (newProduct) {
                 resolve({
@@ -110,7 +111,7 @@ const deleteProduct = (id) => {
 const deleteMany = (ids) => {
     return new Promise(async (resolve, reject) => {
         try {
-            await Product.deleteMany({_id: ids})
+            await Product.deleteMany({ _id: ids })
             resolve({
                 status: 'OK',
                 message: 'Delete product success',
@@ -120,13 +121,14 @@ const deleteMany = (ids) => {
         }
     })
 }
- 
 
-const getAllProduct = (limit , page, sort, filter ) => {
+
+const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const totalProduct = await Product.countDocuments()
-            if(filter){
+            let allProduct = []
+            if (filter) {
                 const label = filter[0]
                 const allObjectFilter = await Product.find({ [label]: { '$regex': filter[1] } }).limit(limit).skip(page * limit)
                 resolve({
@@ -138,7 +140,7 @@ const getAllProduct = (limit , page, sort, filter ) => {
                     totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            if(sort){
+            if (sort) {
                 const objectSort = {}
                 objectSort[sort[1]] = sort[0]
                 const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
@@ -151,7 +153,11 @@ const getAllProduct = (limit , page, sort, filter ) => {
                     totalPage: Math.ceil(totalProduct / limit)
                 })
             }
-            const allProduct = await Product.find().limit(limit).skip(page * limit)
+            if (!limit) {
+                allProduct = await Product.find()
+            } else {
+                allProduct = await Product.find().limit(limit).skip(page * limit)
+            }
             resolve({
                 status: 'OK',
                 message: 'Success',
@@ -181,14 +187,14 @@ const getAllType = () => {
         }
     })
 }
- 
+
 
 module.exports = {
-    createProduct,  
+    createProduct,
     updateProduct,
     getDetailsProduct,
     deleteProduct,
     getAllProduct,
     deleteMany,
-    getAllType 
+    getAllType
 }

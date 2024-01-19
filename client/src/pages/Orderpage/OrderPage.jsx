@@ -1,15 +1,36 @@
-import { Checkbox } from 'antd'
-import React, { useState } from 'react'
-import { LapProCountOrder, LapProInfo, LapProItemOrder, LapProLeft, LapProListOrder, LapProPriceDiscount, LapProRight, LapProStyleHeader, LapProTotal } from '../style';
+import { Checkbox, Form } from 'antd'
+import React, { useEffect, useMemo, useState } from 'react'
+import { WrapperCountOrder, LapProInfo, LapProItemOrder, LapProLeft, LapProListOrder, WrapperRight, LapProStyleHeader, LapProTotal, LapProStyleHeaderStep } from '../style';
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import { LapProInputNumber } from '../../components/style';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import { decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProduct } from '../../redux/slices/orderSlide';
+import { decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProduct, selectedOrder } from '../../redux/slices/orderSlide';
+import { converPrice } from '../../utils';
+import ModalComponent from '../../components/ModalComponent/ModalComponent';
+import InputComponent from '../../InputComponent/InputComponent';
+import { useMutationHook } from '../../hooks/useMutationHook';
+import * as UserService from '../../services/UserService'
+import * as message from '../../components/Message/Message'
+import { updateUser } from '../../redux/slices/useSlide';
+import { useNavigate } from 'react-router-dom';
+import StepComponent from '../../components/StepComponent';
+
 
 const OrderPage = () => {
+  const navigate = useNavigate()
   const order = useSelector((state) => state.order)
+  const user = useSelector((state) => state.user)
   const [listChecked, setListChecked] = useState([])
+  const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false)
+  const [stateUserDetail, setStateUserDetail] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: ''
+  })
+  const [form] = Form.useForm();
+
   const dispatch = useDispatch()
   const onChange = (e) => {
     if (listChecked.includes(e.target.value)) {
@@ -49,6 +70,137 @@ const OrderPage = () => {
       dispatch(removeAllOrderProduct({ listChecked }))
     }
   }
+  // console.log('stateUserDetail', stateUserDetail);
+
+  useEffect(() => {
+    dispatch(selectedOrder({ listChecked }))
+  }, [listChecked])
+
+  useEffect(() => {
+    form.setFieldValue(stateUserDetail)
+  }, [form, stateUserDetail])
+
+  useEffect(() => {
+    if (isOpenModalUpdateInfo) {
+      setStateUserDetail({
+        city: user?.city,
+        name: user?.name,
+        address: user?.address,
+        phone: user?.phone
+      })
+    }
+  }, [isOpenModalUpdateInfo])
+
+  const handleChangeAddress = () => {
+    setIsOpenModalUpdateInfo(true)
+  }
+
+
+  const priceMemo = useMemo(() => {
+    const result = order?.orderItemSelected?.reduce((total, cur) => {
+      return total + ((cur.price * cur.amount))
+    }, 0)
+    return result
+  }, [order])
+
+  const priceDiscountMemo = useMemo(() => {
+    const result = order?.orderItemSelected?.reduce((total, cur) => {
+      return total + ((cur.discount * cur.amount))
+    }, 0)
+    if (Number(result)) {
+      return result
+    }
+    return 0
+  }, [order])
+
+  const diliveryPriceMemo = useMemo(() => {
+    if (priceMemo >= 20000 && priceMemo < 500000) {
+      return 10000
+    }else if(priceMemo >= 500000 || order?.orderItemSelected?.length === 0) {
+      return 0
+    } else {
+      return 20000
+    }
+  }, [priceMemo])
+
+  const totalPriceMemo = useMemo(() => {
+    return Number(priceMemo) - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
+  }, [priceMemo, priceDiscountMemo, diliveryPriceMemo])
+
+  const handleAddCard = () => {
+    console.log('user', user);
+    if (!order?.orderItemSelected?.length) {
+      message.error('Vui lòng chọn sản phẩm')
+    } else if (!user?.phone || !user?.address || !user?.name || !user?.city) {
+      setIsOpenModalUpdateInfo(true)
+    }else {
+      navigate('/payment')
+    }
+  }
+
+  const mutationUpdate = useMutationHook(
+    (data) => {
+      const {
+        id,
+        token,
+        ...rests
+      } = data;
+      const res = UserService.updateUser(
+        id,
+        { ...rests }, token
+      )
+      return res
+    }
+  );
+
+  const { data } = mutationUpdate
+
+  const handleCancelUpdate = () => {
+    setStateUserDetail({
+      name: '',
+      email: '',
+      phone: '',
+      isAdmin: false
+    })
+    form.resetFields()
+    setIsOpenModalUpdateInfo(false)
+  }
+
+  const handleUpdateInfoUser = () => {
+    // console.log('stateUserDetail', stateUserDetail);
+    const { name, address, city, phone } = stateUserDetail
+    if (name && address && city && phone) {
+      mutationUpdate.mutate({ id: user?.id, token: user?.access_token, ...stateUserDetail }, {
+        onSuccess: () => {
+          dispatch(updateUser({ name, address, city, phone }))
+          setIsOpenModalUpdateInfo(false)
+        }
+      })
+    }
+  }
+
+  const handleOnchangeDetail = (e) => {
+    setStateUserDetail({
+      ...stateUserDetail,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const itemsDelivery = [
+    {
+      title: '20.000 VND',
+      description: 'Dưới 200.000 VND',
+    },
+    {
+      title: '10.000 VND',
+      description: 'Từ 200.000 VND đến dưới 500.000 VND',
+    },
+    {
+      title: 'Free ship',
+      description : 'Trên 500.000 VND',
+    },
+  ]
+
 
   return (
     <div style={{ background: '#f5f5fa', with: '100%', height: '100vh' }}>
@@ -56,6 +208,11 @@ const OrderPage = () => {
         <h3>Giỏ hàng</h3>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <LapProLeft>
+            <LapProStyleHeaderStep>
+              <StepComponent items={itemsDelivery} current={diliveryPriceMemo === 10000 
+                ? 2 : diliveryPriceMemo === 20000 ? 1 
+                : order.orderItemSelected.length === 0 ? 0:  3}/>
+            </LapProStyleHeaderStep>
             <LapProStyleHeader>
               <span style={{ display: 'inline-block', width: '390px' }}>
                 <Checkbox onChange={handleOnchangeCheckAll} checked={listChecked?.length === order?.orderItems?.length}></Checkbox>
@@ -84,9 +241,9 @@ const OrderPage = () => {
                     </div>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span>
-                        <span style={{ fontSize: '13px', color: '#242424' }}>{order?.price}</span>
+                        <span style={{ fontSize: '13px', color: '#242424' }}>{converPrice(order?.price)}</span>
                       </span>
-                      <LapProCountOrder>
+                      <WrapperCountOrder>
                         <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product)}>
                           <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
@@ -94,8 +251,8 @@ const OrderPage = () => {
                         <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product)}>
                           <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
-                      </LapProCountOrder>
-                      <span style={{ color: 'rgb(255, 66, 78)', fontSize: '13px', fontWeight: 500 }}>{order?.price * order?.amount}</span>
+                      </WrapperCountOrder>
+                      <span style={{ color: 'rgb(255, 66, 78)', fontSize: '13px', fontWeight: 500 }}>{converPrice(order?.price * order?.amount)}</span>
                       <DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleDeleteOrder(order?.product)} />
                     </div>
                   </LapProItemOrder>
@@ -103,50 +260,100 @@ const OrderPage = () => {
               })}
             </LapProListOrder>
           </LapProLeft>
-          <LapProRight>
+          <WrapperRight>
             <div style={{ width: '100%' }}>
+              <LapProInfo>
+                <div style={{ width: '100%' }}>
+                  <span>Địa chỉ: </span>
+                  <span style={{ fontWeight: 'bold' }}>{`${user?.address} ${user?.city}`} </span>
+                  <span onClick={handleChangeAddress} style={{ color: 'blue', cursor: 'pointer' }}>Thay đổi</span>
+                </div>
+              </LapProInfo>
               <LapProInfo>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>Tạm tính</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>0</span>
+                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>{converPrice(priceMemo)}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>Giảm giá</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>0</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span>Thuế</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>0</span>
+                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>{`${priceDiscountMemo} %`}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>Phí giao hàng</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>0</span>
+                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>{converPrice(diliveryPriceMemo)}</span>
                 </div>
               </LapProInfo>
               <LapProTotal>
                 <span>Tổng tiền</span>
                 <span style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ color: 'rgb(254, 56, 52)', fontSize: '24px', fontWeight: 'bold' }}>0213</span>
+                  <span style={{ color: 'rgb(254, 56, 52)', fontSize: '24px', fontWeight: 'bold' }}>{converPrice(totalPriceMemo)}</span>
                   <span style={{ color: '#000', fontSize: '11px' }}>(Đã bao gồm VAT nếu có)</span>
                 </span>
               </LapProTotal>
             </div>
             <ButtonComponent
-              // onClick={() => handleAddCard(productDetails, numProduct)}
+              onClick={() => handleAddCard()}
               size={40}
               styleButton={{
                 background: 'rgb(255, 57, 69)',
                 height: '48px',
-                width: '220px',
+                width: '320px',
                 border: 'none',
                 borderRadius: '4px'
               }}
               textButton={'Mua hàng'}
               styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
             ></ButtonComponent>
-          </LapProRight>
+          </WrapperRight>
         </div>
       </div>
+      <ModalComponent title='Cập nhật thông tin giao hàng'
+        open={isOpenModalUpdateInfo}
+        onCancel={handleCancelUpdate}
+        onOk={handleUpdateInfoUser}>
+        <Form
+          name="basic"
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+          style={{ maxWidth: 600 }}
+          initialValues={{ remember: true }}
+          autoComplete="on"
+          form={form}
+        >
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: 'Please input your name!' }]}
+          >
+            <InputComponent value={stateUserDetail.name} onChange={handleOnchangeDetail} name="name" />
+          </Form.Item>
+
+          <Form.Item
+            label="City"
+            name="city"
+            rules={[{ required: true, message: 'Please input your city!' }]}
+          >
+            <InputComponent value={stateUserDetail.city} onChange={handleOnchangeDetail} name="city" />
+          </Form.Item>
+
+          <Form.Item
+            label="Phone"
+            name="phone"
+            rules={[{ required: true, message: 'Please input your phone!' }]}
+          >
+            <InputComponent value={stateUserDetail.phone} onChange={handleOnchangeDetail} name="phone" />
+          </Form.Item>
+
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[{ required: true, message: 'Please input your address!' }]}
+          >
+            <InputComponent value={stateUserDetail.address} onChange={handleOnchangeDetail} name="address" />
+          </Form.Item>
+ 
+        </Form>
+      </ModalComponent>
     </div>
   )
 }
