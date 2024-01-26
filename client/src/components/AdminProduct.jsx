@@ -23,8 +23,7 @@ const AdminProduct = () => {
   const user = useSelector((state) => state?.user)
   const searchInput = useRef(null);
   const [typeSelect, setTypeSelect] = useState('')
-
-  const [stateProduct, setStateProduct] = useState({
+  const inittial = () => ({
     name: '',
     type: '',
     countInStock: '',
@@ -32,20 +31,13 @@ const AdminProduct = () => {
     rating: '',
     description: '',
     image: '',
-    newType:'',
+    newType: '',
     discount: ''
   })
 
-  const [stateProductDetail, setStateProductDetail] = useState({
-    name: '',
-    type: '',
-    countInStock: '',
-    price: '',
-    rating: '',
-    description: '',
-    image: '',
-    discount: ''
-  })
+  const [stateProduct, setStateProduct] = useState(inittial())
+
+  const [stateProductDetail, setStateProductDetail] = useState(inittial())
 
   const [form] = Form.useForm();
 
@@ -58,7 +50,7 @@ const AdminProduct = () => {
         rating,
         image,
         type,
-        countInStock, 
+        countInStock,
         discount } = data
       const res = ProductService.createProduct({
         name,
@@ -138,8 +130,12 @@ const AdminProduct = () => {
   }
 
   useEffect(() => {
-    form.setFieldsValue(stateProductDetail)
-  }, [form, stateProductDetail])
+    if(!isModalOpen) {
+      form.setFieldsValue(stateProductDetail)
+    } else {
+      form.setFieldsValue(inittial())
+    }
+  }, [form, stateProductDetail, isModalOpen]) 
 
   useEffect(() => {
     if (rowSelected && isOpenDrawer) {
@@ -387,7 +383,7 @@ const AdminProduct = () => {
       price: '',
       rating: '',
       description: '',
-      image: '', 
+      image: '',
       discount: ''
     })
     form.resetFields()
@@ -516,8 +512,8 @@ const AdminProduct = () => {
               label="New type"
               name="newType"
               rules={[{ required: true, message: 'Please input your type!' }]}
-            > 
-                <InputComponent value={stateProduct.newType} onChange={handleOnchange} name="newType" /> 
+            >
+              <InputComponent value={stateProduct.newType} onChange={handleOnchange} name="newType" />
             </Form.Item>
           )}
 
@@ -648,7 +644,7 @@ const AdminProduct = () => {
             rules={[{ required: true, message: 'Please input your discount of product!' }]}
           >
             <InputComponent value={stateProductDetail.discount} onChange={handleOnchangeDetail} name="discount" />
-          </Form.Item> 
+          </Form.Item>
 
           <Form.Item
             label="Description"

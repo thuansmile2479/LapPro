@@ -23,6 +23,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
     const [userName, setUserName] = useState('')
     const [userAvatar, setUserAvatar] = useState('')
     const [search, setSearch] = useState('')
+    const [isOpenPopup, setIsOpenPopup] = useState(false)
     const order = useSelector((state) => state.order)
     const [loading, setLoading] = useState(false)
     const handleNavigateLogin = () => {
@@ -46,10 +47,11 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
     const content = (
         <div>
             {user?.isAdmin && (
-                <LapProContentPopup onClick={() => navigate('/system/admin')}>Trang quản trị</LapProContentPopup>
+                <LapProContentPopup onClick={() => handleClickNavigate('admin')}>Trang quản trị</LapProContentPopup>
             )}
-            <LapProContentPopup onClick={() => navigate('/profile')}>Trang cá nhân</LapProContentPopup>
-            <LapProContentPopup onClick={handleLogout}>Đăng xuất</LapProContentPopup>
+            <LapProContentPopup onClick={() => handleClickNavigate('profile')}>Trang cá nhân</LapProContentPopup>
+            <LapProContentPopup onClick={() => handleClickNavigate('my_order')}>Đơn hàng của tôi</LapProContentPopup>
+            <LapProContentPopup onClick={() => handleClickNavigate()}>Đăng xuất</LapProContentPopup>
         </div>
     );
     const onSearch = (e) => {
@@ -57,10 +59,24 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
         dispatch(searchProduct(e.target.value))
     }
 
+    const handleClickNavigate = (type) => {
+        if (type === 'profile') {
+            navigate('/profile');
+        } else if (type === 'admin') {
+            navigate('/system/admin');
+        } else if (type === 'my_order') {
+            navigate('/my_order', { state: { id: user?.id, token: user?.access_token } });
+        } else {
+            handleLogout();
+        }
+        setIsOpenPopup(false);
+    }
+    
+
     return (
         <div style={{ width: '100%', display: 'flex', background: 'rgb(26, 148, 255)', justifyContent: 'center' }}>
             <LapProHeader style={{ justifyContent: inSearch && inCart ? 'space-between' : 'flex-end' }}>
-                <Col span={5}><LapProTextHeader>LapPro</LapProTextHeader> </Col>
+                <Col span={5} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}><LapProTextHeader>LapPro</LapProTextHeader> </Col>
                 {!inSearch && (
                     <Col span={13}>
                         <ButtonInputSearch
@@ -85,8 +101,8 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
                                 <UserOutlined style={{ fontSize: '30px' }} />
                             )}
                             {user?.access_token ? (
-                                <Popover content={content} trigger="click">
-                                    <div style={{ cursor: 'pointer' }}>{userName?.length ? userName : user?.email}</div>
+                                <Popover content={content} trigger="click" open={isOpenPopup}>
+                                    <div style={{ cursor: 'pointer' }} onClick={() => setIsOpenPopup((prev) => !prev)}>{userName?.length ? userName : user?.email}</div>
                                 </Popover>
                             ) : (
                                 <div onClick={handleNavigateLogin} style={{ cursor: 'pointer' }}>
@@ -100,7 +116,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
                         </LapProHeaderAccout>
                     </Loading>
                     {!inCart && (
-                        <div onClick={() => navigate('/order')} style={{cursor: 'pointer'}}>
+                        <div onClick={() => navigate('/order')} style={{ cursor: 'pointer' }}>
                             <Badge count={order?.orderItems?.length} size='small'>
                                 <ShoppingCartOutlined style={{ fontSize: '30px', color: '#fff' }} />
                             </Badge>

@@ -263,3 +263,168 @@ export const LapProStyleHeaderStep = styled.div`
   };
   margin-bottom: 4px;
 `
+
+export const LapProStyleHeaders = styled.div`
+  background: rgb(255, 255, 255);
+  padding: 9px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  span {
+    color: rgb(36, 36, 36);
+    font-weight: 400;
+    font-size: 13px;
+  }
+`
+export const LapProStyleHeaderDiliverys = styled.div`
+  background: rgb(255, 255, 255);
+  padding: 9px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  span {
+    color: rgb(36, 36, 36);
+    font-weight: 400;
+    font-size: 13px;
+  };
+  margin-bottom: 4px;
+`
+
+export const LapProContainers = styled.div`
+  height: 100vh;
+  width: 100%;
+  background-color: #f5f5fa;
+`
+
+export const WrapperLeft = styled.div`
+  width: 910px;
+`
+
+export const LapProListOrders = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 20px;
+`
+export const LapProFooterItem = styled.div`
+  display: flex;
+  flex-direction : column;
+  gap: 10px;
+  border-top: 1px solid rgb(235, 235, 240);
+  width: 100%;
+  align-items:flex-end;
+  padding-top: 10px;
+`
+
+export const LapProHeaderItem = styled.div`
+  display: flex;
+  align-items:flex-start;
+  height: 90px;
+  width: 100%;
+`
+
+export const LapProItemOrders = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 9px 16px;
+  background: #fff;
+  margin-top: 12px;
+  flex-direction: column;
+  width: 950px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 12px 12px #ccc;
+`
+
+export const LapProStatus = styled.div`
+  display:flex;
+  align-item:flex-start;
+  width: 100%;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(235, 235, 240);
+  flex-direction:column;
+`
+
+export const LapProHeaderUser = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+export const LapProInfoUser = styled.div`
+  .name-info {
+    font-size: 13px;
+    color: rgb(36, 36, 36);
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .address,.phone-info,.delivery-info,.delivery-fee,.payment-info {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .name-delivery {
+    color: rgb(234, 133, 0); 
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .status-payment {
+    margin-top: 8px;
+    color: rgb(234, 133, 0); 
+  }
+`
+
+export const LapProLabelDetail = styled.div`
+  color: rgb(36, 36, 36);
+  font-size: 13px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+`
+export const LapProContentInfo = styled.div`
+  height: 118px;
+  width: 320px;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 10px;
+`
+
+export const LapProStyleContent = styled.div`
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+`
+
+export const LapProProduct = styled.div`
+  display:flex;
+  align-items:flex-start;
+  margin-top: 10px;
+`
+
+export const LapProNameProduct = styled.div`
+  display:flex;
+  align-items: flex-start;
+  width: 670px;
+`
+
+export const LapProItem = styled.div`
+  width: 200px;
+  font-weight: bold;
+  &:last-child {
+    color: red
+  }
+`
+export const LapProItemLabel = styled.div`
+  width: 200px;
+  &:last-child {
+    font-weight: bold;
+  }
+`
+
+export const LapProAllPrice = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end
+`

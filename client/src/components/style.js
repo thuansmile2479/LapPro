@@ -10,7 +10,9 @@ export const LapProCarStyle = styled(Card)`
         height: 250px;
         width: 250px;
     },
-     
+    position: relative;
+    background-color: ${props => props.disabled ? '#ccc' : '#fff'};
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'}
 `
 
 export const StyleNameProduct = styled.div`

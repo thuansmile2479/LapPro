@@ -17,11 +17,12 @@ const createProduct = (newUser) => {
                 name,
                 image,
                 type,
+                countInStock: Number(countInStock),
                 price,
                 countInStock,
                 rating,
                 description,
-                discount
+                discount: Number(discount),
             })
             if (newProduct) {
                 resolve({
