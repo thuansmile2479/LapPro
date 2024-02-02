@@ -1,14 +1,16 @@
-import React from 'react';
-import * as OrderService from '../services/OrderService'; 
+import React, { useEffect } from 'react';
+import * as OrderService from '../services/OrderService';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ButtonComponent from '../components/ButtonComponent/ButtonComponent';
 import { LapProContainers, LapProFooterItem, LapProHeaderItem, LapProItemOrders, LapProListOrders, LapProStatus } from './style';
 import { converPrice } from '../utils';
+import { useMutationHook } from '../hooks/useMutationHook';
+import * as message from '../components/Message/Message'
 
 const MyOrderPage = () => {
-    const navigate= useNavigate()
+    const navigate = useNavigate()
     const location = useLocation()
     const { state } = location
     const fetchMyOrder = async () => {
@@ -32,9 +34,30 @@ const MyOrderPage = () => {
         })
     }
 
-    // const handleCanceOrder = (id) => {
-    //     Mutation.mutate({id, token: state?.token})
-    // }
+    const mutation = useMutationHook(
+        (data) => {
+            const { id, token, orderItems } = data
+            const res = OrderService.cancelOrder(id, token, orderItems)
+            return res
+        }
+    )
+
+    const handleCanceOrder = (order) => {
+        mutation.mutate({ id: order._id, token: state?.token, orderItems: order?.orderItems }, {
+            onSuccess: () => {
+                queryOrder.refetch()
+            }
+        })
+    }
+    const { isLoading: isLoadingCancel, isSuccess: isSuccessCancel, isError: isErrorCancle, data: dataCancel } = mutation
+
+    useEffect(() => {
+        if (isSuccessCancel && dataCancel?.status === 'OK') {
+            message.success()
+        } else if (isErrorCancle) {
+            message.error()
+        }
+    }, [isErrorCancle, isSuccessCancel])
 
     const renderProduct = (data) => {
         return data?.map((order) => {
@@ -83,7 +106,7 @@ const MyOrderPage = () => {
                                     </div>
                                     <div style={{ display: 'flex', gap: '10px' }}>
                                         <ButtonComponent
-                                            // onClick={() => handleCanceOrder()}
+                                            onClick={() => handleCanceOrder(order)}
                                             size={40}
                                             styleButton={{
                                                 height: '36px',

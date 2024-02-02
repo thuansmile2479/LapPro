@@ -56,7 +56,7 @@ const DetailsOrderPage = () => {
           <LapProInfoUser>
             <LapProLabelDetail>Hình thức thanh toán</LapProLabelDetail>
             <LapProContentInfo>
-              <div className='payment-info'> {orderContant[data?.paymentMethod]} </div>
+              <div className='payment-info'> {orderContant.payment[data?.paymentMethod]} </div>
               <div className='status-payment'> {data?.isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'} </div>
             </LapProContentInfo>
           </LapProInfoUser>
@@ -92,7 +92,7 @@ const DetailsOrderPage = () => {
                 </LapProNameProduct>
                 <LapProItem>{converPrice(order?.price)}</LapProItem>
                 <LapProItem>{order?.amount}</LapProItem>
-                <LapProItem>{order?.discount ? converPrice(order?.discount) : '0 VND'}</LapProItem>
+                <LapProItem>{order?.discount ? converPrice(priceMemo * order?.discount / 100) : '0 VND'}</LapProItem>
 
 
               </LapProProduct>

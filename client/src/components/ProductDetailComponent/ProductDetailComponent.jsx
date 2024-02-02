@@ -54,13 +54,15 @@ const ProductDetailComponent = ({ idProduct }) => {
                     amount: numProduct,
                     image: productDetail?.image,
                     price: productDetail?.price,
-                    product: productDetail?._id
+                    product: productDetail?._id,
+                    discount: productDetail?.discount, 
+                    countInStock: productDetail?.countInStock
                 }
             }))
         }
     }
 
-    console.log('productDetail', productDetail, user);
+    console.log('productDetail', productDetail);
 
 
     return (

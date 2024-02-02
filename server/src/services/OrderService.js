@@ -3,7 +3,7 @@ const Product = require("../models/ProductModel")
 
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
-        const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user } = newOrder
+        const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone, user, isPaid, paiAt } = newOrder
         try {
             const promises = orderItems.map(async (order) => {
                 const productData = await Product.findOneAndUpdate(
@@ -117,20 +117,66 @@ const getOrderDetail = (id) => {
     })
 }
 
-const cancelOrderDetail = (id) => {
+const cancelOrderDetail = (id, data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const order = await Order.findById(id)
-            if (order === null) {
+            // const order = await Order.findByIdAndDelete(id)
+            // if (order === null) {
+            //     resolve({
+            //         status: 'ERR',
+            //         message: 'The order is not defined'
+            //     })
+            // }
+
+            // resolve({
+            //     status: 'OK',
+            //     message: 'SUCESSS',
+            //     data: order
+            // })
+
+            let order = []
+            const promises = data.map(async (order) => {
+                const productData = await Product.findOneAndUpdate(
+                    {
+                        _id: order.product,
+                        selled: { $gte: order.amount }
+                    },
+                    {
+                        $inc: {
+                            countInStock: +order.amount,
+                            selled: -order.amount
+                        }
+                    },
+                    { new: true }
+                ) 
+                console.log('productData', productData);
+                if (productData) {
+                     order = await Order.findByIdAndDelete(id)
+                    if (order === null) {
+                        resolve({
+                            status: 'ERR',
+                            message: 'The order is not defined'
+                        })
+                    }
+                } else {
+                    return {
+                        status: 'OK',
+                        message: 'ERR',
+                        id: order.product
+                    }
+                }
+            })
+            const results = await Promise.all(promises)
+            const newData = results && results.filter((item) => item)
+            if(newData.length) {
                 resolve({
                     status: 'ERR',
-                    message: 'The order is not defined'
+                    message: `Sản phẩm với id${newData.join(',')} không tồn tại`
                 })
             }
-
             resolve({
                 status: 'OK',
-                message: 'SUCESSS',
+                message: 'success', 
                 data: order
             })
         } catch (e) {

@@ -41,11 +41,15 @@ const OrderPage = () => {
     }
   };
 
-  const handleChangeCount = (type, idProduct) => {
+  const handleChangeCount = (type, idProduct, limited) => {
     if (type === 'increase') {
-      dispatch(increaseAmount({ idProduct }))
+      if (!limited) {
+        dispatch(increaseAmount({ idProduct }))
+      }
     } else {
-      dispatch(decreaseAmount({ idProduct }))
+      if (!limited) {
+        dispatch(decreaseAmount({ idProduct }))
+      }
     }
   }
 
@@ -105,7 +109,8 @@ const OrderPage = () => {
 
   const priceDiscountMemo = useMemo(() => {
     const result = order?.orderItemSelected?.reduce((total, cur) => {
-      return total + ((cur.discount * cur.amount))
+      const totalDiscount = cur.discount ? cur.discount : 0
+      return total + (priceMemo * (totalDiscount * cur.amount) / 100)
     }, 0)
     if (Number(result)) {
       return result
@@ -116,7 +121,7 @@ const OrderPage = () => {
   const diliveryPriceMemo = useMemo(() => {
     if (priceMemo >= 20000 && priceMemo < 500000) {
       return 10000
-    }else if(priceMemo >= 500000 || order?.orderItemSelected?.length === 0) {
+    } else if (priceMemo >= 500000 || order?.orderItemSelected?.length === 0) {
       return 0
     } else {
       return 20000
@@ -133,7 +138,7 @@ const OrderPage = () => {
       message.error('Vui lòng chọn sản phẩm')
     } else if (!user?.phone || !user?.address || !user?.name || !user?.city) {
       setIsOpenModalUpdateInfo(true)
-    }else {
+    } else {
       navigate('/payment')
     }
   }
@@ -197,7 +202,7 @@ const OrderPage = () => {
     },
     {
       title: 'Free ship',
-      description : 'Trên 500.000 VND',
+      description: 'Trên 500.000 VND',
     },
   ]
 
@@ -209,9 +214,9 @@ const OrderPage = () => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <LapProLeft>
             <LapProStyleHeaderStep>
-              <StepComponent items={itemsDelivery} current={diliveryPriceMemo === 10000 
-                ? 2 : diliveryPriceMemo === 20000 ? 1 
-                : order.orderItemSelected.length === 0 ? 0:  3}/>
+              <StepComponent items={itemsDelivery} current={diliveryPriceMemo === 10000
+                ? 2 : diliveryPriceMemo === 20000 ? 1
+                  : order.orderItemSelected.length === 0 ? 0 : 3} />
             </LapProStyleHeaderStep>
             <LapProStyleHeader>
               <span style={{ display: 'inline-block', width: '390px' }}>
@@ -244,11 +249,11 @@ const OrderPage = () => {
                         <span style={{ fontSize: '13px', color: '#242424' }}>{converPrice(order?.price)}</span>
                       </span>
                       <WrapperCountOrder>
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product)}>
+                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 0)}>
                           <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
-                        <LapProInputNumber defaultValue={order?.amount} value={order?.amount} size="small" />
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product)}>
+                        <LapProInputNumber defaultValue={order?.amount} value={order?.amount} size="small" min={1} max={order?.countInStock} />
+                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order.countInStock)}>
                           <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
                       </WrapperCountOrder>
@@ -276,7 +281,7 @@ const OrderPage = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>Giảm giá</span>
-                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>{`${priceDiscountMemo} %`}</span>
+                  <span style={{ color: '#000', fontSize: '14px', fontWeight: 'bold' }}>{converPrice(priceDiscountMemo)}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>Phí giao hàng</span>
@@ -351,7 +356,7 @@ const OrderPage = () => {
           >
             <InputComponent value={stateUserDetail.address} onChange={handleOnchangeDetail} name="address" />
           </Form.Item>
- 
+
         </Form>
       </ModalComponent>
     </div>

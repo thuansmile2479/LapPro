@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Card, Row, Image, Col, InputNumber, Input, Upload, Steps } from "antd";
 import Slider from "react-slick";
+import { Link } from "react-router-dom";
 const { Step } = Steps;
 
 
@@ -52,7 +53,7 @@ export const LapProHeader = styled(Row)`
     padding: 10px 0
 `
 
-export const LapProTextHeader = styled.span`
+export const LapProTextHeader = styled(Link)`
     font-size: 18px;
     color: #fff;
     font-weight:bold;
