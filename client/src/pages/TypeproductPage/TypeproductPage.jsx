@@ -25,8 +25,7 @@ const TypeproductPage = () => {
       setPanigate({ ...panigate, total: res?.total })
     } else {
 
-    }
-    console.log('res', res);
+    } 
   }
 
   // useEffect(() => {

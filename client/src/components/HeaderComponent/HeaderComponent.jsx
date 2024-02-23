@@ -71,7 +71,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
         }
         setIsOpenPopup(false);
     }
-    
+
 
     return (
         <div style={{ width: '100%', display: 'flex', background: 'rgb(26, 148, 255)', justifyContent: 'center' }}>
@@ -81,7 +81,7 @@ const HeaderComponent = ({ inSearch = false, inCart = false }) => {
                     <Col span={13}>
                         <ButtonInputSearch
                             size="large"
-                            textButton="Tìm kiếm"
+                            textbutton="Tìm kiếm"
                             placeholder="input search text"
                             onChange={onSearch}
                         />

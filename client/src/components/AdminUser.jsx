@@ -35,8 +35,7 @@ const AdminUser = () => {
   const [form] = Form.useForm();
 
   const mutationUpdate = useMutationHook(
-    (data) => {
-      // console.log('data', data);
+    (data) => { 
       const {
         id,
         token,
@@ -111,8 +110,7 @@ const AdminUser = () => {
       fetchGetDetailUser(rowSelected)
     }
   }, [rowSelected, isOpenDrawer])
-
-  // console.log("satetProduct", stateUserDetail);
+ 
   const handleDetailsProduct = () => {
     // if (rowSelected) {
     //   fetchGetDetailUser()
@@ -336,8 +334,8 @@ const AdminUser = () => {
       ...stateUserDetail,
       avatar: file.preview
     })
-  }
-  // console.log('user', user);
+  } 
+  
   const onUpdateUser = () => {
     mutationUpdate.mutate({ id: rowSelected, token: user?.access_token, ...stateUserDetail }, {
       onSettled: () => {

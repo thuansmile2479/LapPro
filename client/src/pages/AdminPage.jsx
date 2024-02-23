@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { AppstoreOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { getItem } from '../utils';
 import HeaderComponent from '../components/HeaderComponent/HeaderComponent';
 import AdminUser from '../components/AdminUser';
 import AdminProduct from '../components/AdminProduct';
+import OrderAdmin from '../components/OrderAdmin';
 
 const AdminPage = () => {
   const items = [
     getItem('Người dùng', 'user', <UserOutlined />),
-    getItem('Sản phẩm', 'product', <AppstoreOutlined />)
+    getItem('Sản phẩm', 'product', <AppstoreOutlined />),
+    getItem('Đơn hàng', 'order', <ShoppingCartOutlined />),
   ];
 
   const [keySelected, setKeySelected] = useState('')
 
   const renderPage = (key) => {
-    switch(key) {
+    switch (key) {
       case 'user':
         return (
           <AdminUser />
@@ -23,6 +25,10 @@ const AdminPage = () => {
       case 'product':
         return (
           <AdminProduct />
+        )
+      case 'order':
+        return (
+          <OrderAdmin />
         )
       default:
         return <></>
@@ -32,12 +38,12 @@ const AdminPage = () => {
   const handleOnClick = ({ key }) => {
     setKeySelected(key)
   }
-  // console.log('keyS', keySelected);
+ 
 
   return (
     <>
       <HeaderComponent inSearch inCart />
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', overflowX: 'hidden' }}>
         <Menu
           mode="inline"
           style={{
@@ -48,7 +54,7 @@ const AdminPage = () => {
           items={items}
           onClick={handleOnClick}
         />
-        <div style={{ flex: 1, padding: '15px' }}>
+        <div style={{ flex: 1, padding: '15px 0 15px 15px' }}>
           {renderPage(keySelected)}
         </div>
       </div>

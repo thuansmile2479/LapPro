@@ -23,8 +23,7 @@ const DetailsOrderPage = () => {
   });
 
 
-  const { data } = queryOrder
-  console.log('dada', data);
+  const { data } = queryOrder 
 
   const priceMemo = useMemo(() => {
     const result = data?.orderItems?.reduce((total, cur) => {

@@ -28,18 +28,18 @@ const SignInPage = () => {
   )
   const { data, isLoading, isSuccess } = mutation
 
-  useEffect(() => {
-    console.log('location', location);
-    if(isSuccess) {
-      if(location?.state) {
+  useEffect(() => { 
+    if (isSuccess) {
+      if (location?.state) {
         navigate(location?.state)
-      }else {
+      } else {
         navigate('/')
       }
       localStorage.setItem('access_token', JSON.stringify(data?.access_token))
-      if(data?.access_token) {
+      localStorage.setItem('refresh_token', JSON.stringify(data?.refresh_token))
+      if (data?.access_token) {
         const decoded = jwtDecode(data?.access_token)
-        if(decoded?.id) {
+        if (decoded?.id) {
           handleGetDetailUser(decoded?.id, data?.access_token)
         }
       }
@@ -47,11 +47,12 @@ const SignInPage = () => {
   }, [isSuccess])
 
   const handleGetDetailUser = async (id, token) => {
+    const storage = localStorage.getItem('refresh_token')
+    const refreshToken = JSON.parse(storage)
     const res = await UserService.getDetailUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token}))
+    dispatch(updateUser({ ...res?.data, access_token: token, refreshToken }))
   }
-
-  // console.log('mutation', mutation);
+ 
 
   const handleNavigateSignUp = () => {
     navigate('/signup')
@@ -69,8 +70,7 @@ const SignInPage = () => {
     mutation.mutate({
       email,
       password
-    })
-    // console.log('signin', email, password)
+    }) 
   }
 
   return (
@@ -110,22 +110,22 @@ const SignInPage = () => {
           </div>
           {data?.status === 'ERR' && <span style={{ color: 'red' }}>{data?.message}</span>}
           {/* <Loading isLoading={isLoading}> */}
-            <ButtonComponent
-              disabled={!email.length || !password.length}
-              onClick={handleSignIn}
-              size={40}
-              styleButton={{
-                background: 'rgb(255, 57, 69)',
-                height: '48px',
-                width: '100%',
-                border: 'none',
-                borderRadius: '4px',
-                margin: '26px 0 10px'
-              }}
-              textButton={'Đăng nhập'}
-              styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
-            >
-            </ButtonComponent>
+          <ButtonComponent
+            disabled={!email.length || !password.length}
+            onClick={handleSignIn}
+            size={40}
+            styleButton={{
+              background: 'rgb(255, 57, 69)',
+              height: '48px',
+              width: '100%',
+              border: 'none',
+              borderRadius: '4px',
+              margin: '26px 0 10px'
+            }}
+            textbutton={'Đăng nhập'}
+            styletextbutton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
+          >
+          </ButtonComponent>
           {/* </Loading> */}
           <p><LapProTextLight>Quên mật khẩu?</LapProTextLight></p>
           <p>Chưa có tài khoản? <LapProTextLight onClick={handleNavigateSignUp} > Tạo tài khoản</LapProTextLight></p>

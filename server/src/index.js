@@ -20,7 +20,7 @@ routes(app)
 
 mongoose.connect(`${process.env.MONGO_DB}`)
     .then(() => {
-        console.log('Connect DB seccess!');
+        console.log('Connect DB seccess!'); 
     })
     .catch((err) => {
         console.log(err);

@@ -1,5 +1,5 @@
-import { Col, Image, Rate, Row } from 'antd'
-import React, { useState } from 'react'
+import { Col, Image, Rate, Row, message } from 'antd'
+import React, { useEffect, useState } from 'react'
 import pro02 from '../../assets/images/pro02.webp'
 import { LapProInputNumber, LapProPriceProduct, LapProPricetextProduct, LapProQualityProduct, LapProStyleColImage, LapProStyleImageSmall, LapProStyleTextSell, LapProStylenameProduct } from '../style'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
@@ -8,8 +8,9 @@ import * as ProductService from '../../services/ProductService'
 import { useQuery } from '@tanstack/react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { addOrderProduct } from '../../redux/slices/orderSlide';
+import { addOrderProduct, resetOrder } from '../../redux/slices/orderSlide';
 import { converPrice } from '../../utils';
+// import * as message from '../Message/Message'
 
 const ProductDetailComponent = ({ idProduct }) => {
     const navigate = useNavigate()
@@ -17,6 +18,8 @@ const ProductDetailComponent = ({ idProduct }) => {
     const dispatch = useDispatch()
     const [numProduct, setNumProduct] = useState(1)
     const user = useSelector((state) => state.user)
+    const order = useSelector((state) => state.order)
+    const [errorLimitOrder, setErrorLimitOrder] = useState(false)
     const onChange = (value) => {
         setNumProduct(Number(value))
     }
@@ -27,42 +30,69 @@ const ProductDetailComponent = ({ idProduct }) => {
             return res.data
         }
     }
-    // console.log('location', location);
 
+    useEffect(() => {
+        const orderRedux = order?.orderItems?.find((item) => item.product === productDetail?._id)
+        if ((orderRedux?.amount + numProduct) <= orderRedux?.countInstock || (!orderRedux && productDetail?.countInStock > 0)) {
+            setErrorLimitOrder(false) 
+        } else if(productDetail?.countInStock === 0) {
+            setErrorLimitOrder(true)
+        }
+    }, [numProduct])
 
-    const handleChangeCount = (type) => {
+    useEffect(() => {
+        if (order.isSucessOrder) {
+            message.success('Đã thêm vào giỏ hàng')
+        }
+        // else {
+        //     message.success('Sản phẩm đã hết hàng')
+        // }
+        return () => {
+            dispatch(resetOrder())
+        }
+    }, [order.isSucessOrder])
+
+    const handleChangeCount = (type, limited) => {
         if (type === 'increase') {
-            setNumProduct(numProduct + 1)
+            if (!limited) {
+                setNumProduct(numProduct + 1)
+            }
         } else {
-            setNumProduct(numProduct - 1)
+            if (!limited) {
+                setNumProduct(numProduct - 1)
+            }
         }
     }
- 
+
     const { data: productDetail } = useQuery({
         queryKey: ['product-detail', idProduct],
         queryFn: fetchGetDetailProduct,
         config: { enabled: !!idProduct }
     });
-    
+
     const handleAddOrderProduct = () => {
         if (!user?.id) {
             navigate('/signin', { state: location?.pathname })
         } else {
-            dispatch(addOrderProduct({
-                orderItem: {
-                    name: productDetail?.name,
-                    amount: numProduct,
-                    image: productDetail?.image,
-                    price: productDetail?.price,
-                    product: productDetail?._id,
-                    discount: productDetail?.discount, 
-                    countInStock: productDetail?.countInStock
-                }
-            }))
+            const orderRedux = order?.orderItems?.find((item) => item.product === productDetail?._id)
+            if ((orderRedux?.amount + numProduct) <= orderRedux?.countInstock || (!orderRedux && productDetail?.countInStock > 0)) {
+                dispatch(addOrderProduct({
+                    orderItem: {
+                        name: productDetail?.name,
+                        amount: numProduct,
+                        image: productDetail?.image,
+                        price: productDetail?.price,
+                        product: productDetail?._id,
+                        discount: productDetail?.discount,
+                        countInstock: productDetail?.countInStock
+                    }
+                }))
+            } else {
+                setErrorLimitOrder(true)
+            }
         }
     }
-
-    console.log('productDetail', productDetail);
+ 
 
 
     return (
@@ -114,33 +144,33 @@ const ProductDetailComponent = ({ idProduct }) => {
                     <div style={{ margin: '10px 0 20px', padding: '10px 0', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
                         <div style={{ marginBottom: '10px' }}>Số lượng</div>
                         <LapProQualityProduct>
-                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease')}>
+                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', numProduct === 1)}>
                                 <MinusOutlined style={{ color: '#000', fontSize: '20px' }} />
                             </button>
-                            <LapProInputNumber onChange={onChange} defaultValue={1} value={numProduct} size="small" />
-                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase')}>
+                            <LapProInputNumber onChange={onChange} defaultValue={1} max={productDetail?.countInStock} min={1} value={numProduct} size="small" />
+                            <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', numProduct === productDetail?.countInStock)}>
                                 <PlusOutlined style={{ color: '#000', fontSize: '20px' }} />
                             </button>
                         </LapProQualityProduct>
                     </div>
                 </div>
                 <div style={{ display: 'flex', aliggItems: 'center', gap: '12px' }}>
-                    {/* <div> */}
-                    <ButtonComponent
-                        size={40}
-                        styleButton={{
-                            background: 'rgb(255, 57, 69)',
-                            height: '48px',
-                            width: '220px',
-                            border: 'none',
-                            borderRadius: '4px'
-                        }}
-                        onClick={handleAddOrderProduct}
-                        textButton={'Chọn mua'}
-                        styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
-                    ></ButtonComponent>
-                    {/* {errorLimitOrder && <div style={{color: 'red'}}>San pham het hang</div>} */}
-                    {/* </div> */}
+                    <div>
+                        <ButtonComponent
+                            size={40}
+                            styleButton={{
+                                background: 'rgb(255, 57, 69)',
+                                height: '48px',
+                                width: '220px',
+                                border: 'none',
+                                borderRadius: '4px'
+                            }}
+                            onClick={handleAddOrderProduct}
+                            textbutton={'Chọn mua'}
+                            styletextbutton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
+                        ></ButtonComponent>
+                        {errorLimitOrder && <div style={{ color: 'red' }}>San pham het hang</div>}
+                    </div>
                     <ButtonComponent
                         size={40}
                         styleButton={{
@@ -150,8 +180,8 @@ const ProductDetailComponent = ({ idProduct }) => {
                             border: '1px solid rgb(13, 92, 182)',
                             borderRadius: '4px'
                         }}
-                        textButton={'Mua trả sau'}
-                        styleTextButton={{ color: 'rgb(13, 92, 182)', fontSize: '15px' }}
+                        textbutton={'Mua trả sau'}
+                        styletextbutton={{ color: 'rgb(13, 92, 182)', fontSize: '15px' }}
                     ></ButtonComponent>
                 </div>
             </Col>

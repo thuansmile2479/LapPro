@@ -145,7 +145,7 @@ const deleteMany = (ids) => {
 const getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allUser = await User.find().sort({createdAt: -1, updatedAt: -1})
+            const allUser = await User.find()
             resolve({
                 status: 'OK',
                 message: 'Success',

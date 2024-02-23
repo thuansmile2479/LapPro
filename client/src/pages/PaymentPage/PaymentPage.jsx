@@ -105,7 +105,8 @@ const PaymentPage = () => {
           itemsPrice: priceMemo,
           shippingPrice: diliveryPriceMemo,
           totalPrice: totalPriceMemo,
-          user: user?.id
+          user: user?.id,
+          email: user?.email
         }
       )
     }
@@ -191,7 +192,8 @@ const PaymentPage = () => {
         totalPrice: totalPriceMemo,
         user: user?.id,
         isPaid: true,
-        paidAt: details.update_time
+        paidAt: details.update_time,
+        email: user?.email
       }
     )
   }
@@ -303,7 +305,7 @@ const PaymentPage = () => {
             {payment === 'paypal' && sdkReady ? (
               <div style={{ width: '320px' }}>
                 <PayPalButton
-                  amount={totalPriceMemo}
+                  amount={Math.round(totalPriceMemo / 30000)}
                   // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
                   onSuccess={onSuccessPaypal}
                   onError={() => {
@@ -322,8 +324,8 @@ const PaymentPage = () => {
                   border: 'none',
                   borderRadius: '4px'
                 }}
-                textButton={'Đặt hàng'}
-                styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
+                textbutton={'Đặt hàng'}
+                styletextbutton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
               ></ButtonComponent>
             )
             }

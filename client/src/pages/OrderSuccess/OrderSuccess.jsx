@@ -8,8 +8,7 @@ import useSelection from 'antd/es/table/hooks/useSelection';
 
 const OrderSuccess = () => {
   const order = useSelection((state) => state.order)
-  const location = useLocation()
-  console.log('location', location);
+  const location = useLocation() 
   const { state } = location
   return (
     <div style={{ background: '#f5f5fa', with: '100%', height: '100vh' }}>

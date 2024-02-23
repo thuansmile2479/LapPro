@@ -73,8 +73,7 @@ const OrderPage = () => {
     if (listChecked?.length > 1) {
       dispatch(removeAllOrderProduct({ listChecked }))
     }
-  }
-  // console.log('stateUserDetail', stateUserDetail);
+  } 
 
   useEffect(() => {
     dispatch(selectedOrder({ listChecked }))
@@ -132,8 +131,7 @@ const OrderPage = () => {
     return Number(priceMemo) - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
   }, [priceMemo, priceDiscountMemo, diliveryPriceMemo])
 
-  const handleAddCard = () => {
-    console.log('user', user);
+  const handleAddCard = () => { 
     if (!order?.orderItemSelected?.length) {
       message.error('Vui lòng chọn sản phẩm')
     } else if (!user?.phone || !user?.address || !user?.name || !user?.city) {
@@ -171,8 +169,7 @@ const OrderPage = () => {
     setIsOpenModalUpdateInfo(false)
   }
 
-  const handleUpdateInfoUser = () => {
-    // console.log('stateUserDetail', stateUserDetail);
+  const handleUpdateInfoUser = () => { 
     const { name, address, city, phone } = stateUserDetail
     if (name && address && city && phone) {
       mutationUpdate.mutate({ id: user?.id, token: user?.access_token, ...stateUserDetail }, {
@@ -233,7 +230,7 @@ const OrderPage = () => {
             <LapProListOrder>
               {order?.orderItems?.map((order) => {
                 return (
-                  <LapProItemOrder>
+                  <LapProItemOrder key={order?.product}>
                     <div style={{ width: '390px', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <Checkbox onChange={onChange} value={order?.product} checked={listChecked.includes(order?.product)}></Checkbox>
                       <img src={order?.image} style={{ width: '77px', height: '79px', objectFit: 'cover' }} />
@@ -249,11 +246,11 @@ const OrderPage = () => {
                         <span style={{ fontSize: '13px', color: '#242424' }}>{converPrice(order?.price)}</span>
                       </span>
                       <WrapperCountOrder>
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 0)}>
+                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('decrease', order?.product, order?.amount === 1)}>
                           <MinusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
                         <LapProInputNumber defaultValue={order?.amount} value={order?.amount} size="small" min={1} max={order?.countInStock} />
-                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order.countInStock)}>
+                        <button style={{ border: 'none', background: 'transparent', cursor: 'pointer' }} onClick={() => handleChangeCount('increase', order?.product, order?.amount === order.countInStock, order?.amount === 1)}>
                           <PlusOutlined style={{ color: '#000', fontSize: '10px' }} />
                         </button>
                       </WrapperCountOrder>
@@ -306,8 +303,8 @@ const OrderPage = () => {
                 border: 'none',
                 borderRadius: '4px'
               }}
-              textButton={'Mua hàng'}
-              styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
+              textbutton={'Mua hàng'}
+              styletextbutton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
             ></ButtonComponent>
           </WrapperRight>
         </div>

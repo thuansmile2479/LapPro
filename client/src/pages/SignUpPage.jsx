@@ -27,13 +27,13 @@ const SignUpPage = () => {
     data => UserService.signupUser(data)
   )
 
-  const { data, isLoading, isSuccess, isError }  = mutation
+  const { data, isLoading, isSuccess, isError } = mutation
 
   useEffect(() => {
-    if(isSuccess) {
+    if (isSuccess) {
       message.success()
       handleNavigateSignIn()
-    }else if(isError) {
+    } else if (isError) {
       message.error()
     }
   }, [isSuccess, isError])
@@ -128,8 +128,8 @@ const SignUpPage = () => {
               borderRadius: '4px',
               margin: '26px 0 10px'
             }}
-            textButton={'Đăng ký'}
-            styleTextButton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
+            textbutton={'Đăng ký'}
+            styletextbutton={{ color: '#fff', fontSize: '15px', fontWeight: '700' }}
           >
           </ButtonComponent>
           <p>Bạn đã có tài khoản ?<LapProTextLight onClick={handleNavigateSignIn}> Đăng nhập</LapProTextLight></p>

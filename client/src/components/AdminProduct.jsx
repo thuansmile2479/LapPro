@@ -67,8 +67,7 @@ const AdminProduct = () => {
   )
 
   const mutationUpdate = useMutationHook(
-    (data) => {
-      console.log('data', data);
+    (data) => { 
       const {
         id,
         token,
@@ -142,8 +141,7 @@ const AdminProduct = () => {
       fetchGetDetailProduct(rowSelected)
     }
   }, [rowSelected, isOpenDrawer])
-
-  // console.log("satetProduct", stateProductDetail);
+ 
   const handleDetailsProduct = () => {
     // if (rowSelected) {
     //   fetchGetDetailProduct()
@@ -441,8 +439,7 @@ const AdminProduct = () => {
       ...stateProductDetail,
       image: file.preview
     })
-  }
-  // console.log('user', user);
+  } 
   const onUpdateProduct = () => {
     mutationUpdate.mutate({ id: rowSelected, token: user?.access_token, ...stateProductDetail }, {
       onSettled: () => {

@@ -61,7 +61,7 @@ const MyOrderPage = () => {
 
     const renderProduct = (data) => {
         return data?.map((order) => {
-            return <LapProHeaderItem>
+            return <LapProHeaderItem key={order?._id}>
                 <img src={order?.image}
                     style={{
                         width: '70px',
@@ -113,8 +113,8 @@ const MyOrderPage = () => {
                                                 border: '1px solid rgb(11, 116, 229)',
                                                 borderRadius: '4px'
                                             }}
-                                            textButton={'Hủy đơn hàng'}
-                                            styleTextButton={{ color: 'rgb(11, 116, 229)', fontSize: '14px' }}
+                                            textbutton={'Hủy đơn hàng'}
+                                            styletextbutton={{ color: 'rgb(11, 116, 229)', fontSize: '14px' }}
                                         >
                                         </ButtonComponent>
                                         <ButtonComponent
@@ -125,8 +125,8 @@ const MyOrderPage = () => {
                                                 border: '1px solid rgb(11, 116, 229)',
                                                 borderRadius: '4px'
                                             }}
-                                            textButton={'Xem chi tiết'}
-                                            styleTextButton={{ color: 'rgb(11, 116, 229)', fontSize: '14px' }}
+                                            textbutton={'Xem chi tiết'}
+                                            styletextbutton={{ color: 'rgb(11, 116, 229)', fontSize: '14px' }}
                                         >
                                         </ButtonComponent>
                                     </div>

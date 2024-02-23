@@ -17,8 +17,8 @@ const CardComponent = (props) => {
             style={{ width: 250 }}
             bodyStyle={{ padding: '10px' }}
             cover={<img alt="example" src={image} />}
-            onClick={() =>countInStock !== 0 && handleDetailProduct(id)}
-            disabled = {countInStock === 0}
+            onClick={() => handleDetailProduct(id)}
+            // disabled = {countInStock === 0}
         > 
             <StyleNameProduct>{name}</StyleNameProduct>
             <LapProReportText>

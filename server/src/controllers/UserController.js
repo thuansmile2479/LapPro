@@ -54,9 +54,10 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             //thêm bảo mật phía client
             secure: false,
-            samsite: 'strict'
+            samsite: 'strict',
+            path: '/'
         })
-        return res.status(200).json(newReponse)
+        return res.status(200).json({ ...newReponse, refresh_token})
     } catch (e) {
         return res.status(404).json({
             message: e
@@ -150,7 +151,7 @@ const getDetailUser = async (req, res) => {
 
 const refreshlToken = async (req, res) => {
     try {
-        const token = req.cookies.refresh_token
+        let token = req.cookies.token.split(' ')[1]
         if (!token) {
             return res.status(200).json({
                 status: 'ERR',
